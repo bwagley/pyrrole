@@ -7,69 +7,64 @@
 
 class freq_gen{
 public:
-	freq_gen(){
-		std::cout << "Opening PCM Device" << std::endl;
-		_err = snd_pcm_open(&_pcm_dev, "default", SND_PCM_STREAM_PLAYBACK, 0);
-		std::cout << snd_strerror(_err) << std::endl;
-	}
+	freq_gen(){}
 
 	void init(){
-		vals = new short int(_len);
-		snd_pcm_hw_params_alloca(&_hw_params);
+		vals = new short int(len);
+    		snd_pcm_hw_params_alloca(&hwparams);
 
-		snd_pcm_hw_params_any(_pcm_dev, _hw_params);
+    		err = snd_pcm_open(&pcm_dev, pcm_name, stream, 0);
+    		std::cout << "Opening: " << snd_strerror(err) << std::endl;
 
-		std::cout << "Setting Access" << std::endl;
-		_err = snd_pcm_hw_params_set_access(_pcm_dev, _hw_params, SND_PCM_ACCESS_RW_INTERLEAVED);
-		std::cout << snd_strerror(_err) << std::endl;
+    		err = snd_pcm_hw_params_any(pcm_dev, hwparams);
+		std::cout << "Initializing hwparams structure: " << snd_strerror(err) << std::endl;   
+	
+    		err = snd_pcm_hw_params_set_access(pcm_dev, hwparams, SND_PCM_ACCESS_RW_INTERLEAVED);
+    		std::cout << "Setting access: " << snd_strerror(err) << std::endl;
 
-		std::cout << "Setting Format" << std::endl;
-		_err = snd_pcm_hw_params_set_format(_pcm_dev, _hw_params, SND_PCM_FORMAT_S16_LE);
-		std::cout << snd_strerror(_err) << std::endl;
+    		err = snd_pcm_hw_params_set_format(pcm_dev, hwparams, SND_PCM_FORMAT_S16_LE);
+    		std::cout << "Setting format: " << snd_strerror(err) << std::endl;
 
-		std::cout << "Setting Rate" << std::endl;
-		_err = snd_pcm_hw_params_set_rate(_pcm_dev, _hw_params, _rate, (int) 0);
-		std::cout << snd_strerror(_err) << std::endl;
+    		err = snd_pcm_hw_params_set_rate(pcm_dev, hwparams, rate, (int)0);
+    		std::cout << "Setting rate: " << snd_strerror(err) << std::endl;
 
-		std::cout << "Setting Channels" << std::endl;
-		_err = snd_pcm_hw_params_set_channels(_pcm_dev, _hw_params, 2);
-		std::cout << snd_strerror(_err) << std::endl;
+    		err = snd_pcm_hw_params_set_channels(pcm_dev, hwparams, 2); 
+    		std::cout << "Setting channels: " << snd_strerror(err) << std::endl;
 
-		std::cout << "Setting Periods" << std::endl;
-		_err = snd_pcm_hw_params_set_periods(_pcm_dev, _hw_params, 2, 0);
-		std::cout << snd_strerror(_err) << std::endl;
+		err = snd_pcm_hw_params_set_periods(pcm_dev, hwparams, 2, 0);
+		std::cout << "Setting periods: " << snd_strerror(err) << std::endl;
 
-		std::cout << "Setting Buffer Size" << std::endl;
-		_err = snd_pcm_hw_params_set_buffer_size_near(_pcm_dev, _hw_params, &_buf_size);
-		std::cout << snd_strerror(_err) << std::endl;
+    		err = snd_pcm_hw_params_set_buffer_size_near(pcm_dev, hwparams, &bufferSize);
+		std::cout << "Setting buffer size: " << snd_strerror(err) << std::endl;
 
-		std::cout << "Inializing PCM Device" << std::endl;
-		_err = snd_pcm_hw_params(_pcm_dev, _hw_params);
-		std::cout << snd_strerror(_err) << std::endl;
+ 	         err = snd_pcm_hw_params(pcm_dev, hwparams);
+   		 std::cout << "Applying parameters: " << snd_strerror(err) << std::endl;
 
+		 std::cout << std::endl << std::endl;
 	}
 
-	void sine_wave(unsigned int freq){
-		for(short int i = 0; i < _len; i++){
-			vals[i] = SHRT_MAX * cos(PI*freq / _rate * i);
+	void sine_wav(uint16_t freq){
+		for(int i = 0; i < len; i++){
+			vals[i] = SHRT_MAX * cos(3.14159 * freq / rate * i);
 		}
 	}
 
-	void play_sound(unsigned int  freq){
-		sine_wave(freq);
-		unsigned int len = 100;
-		snd_pcm_prepare(_pcm_dev);
-		std::cout << "Playing Tone" << std::endl;
-		_err = snd_pcm_writei(_pcm_dev, vals, len); 
-		std::cout << snd_strerror(_err) << std::endl;
-	}	
+	void play_sound(uint16_t freq){
+		int err;
+		while(true){
+			err = snd_pcm_writei(pcm_dev, vals, len);
+		}
+	}
 
-	int _err;
-	int _rate = 48000;
-	unsigned long int _buf_size=  8192*4;
-	unsigned int _len = _buf_size*100;
-	snd_pcm_hw_params_t *_hw_params;
-	snd_pcm_t * _pcm_dev;
-	signed short int* vals;
+    	int err;
+	
+    	snd_pcm_t* pcm_dev;
+    	snd_pcm_stream_t stream = SND_PCM_STREAM_PLAYBACK;
+    	snd_pcm_hw_params_t* hwparams;  // hardware information
+    	char* pcm_name = strdup("default");  // on-board audio jack
+    	int rate = 48000;
 
+    	long unsigned int bufferSize = 8192*4;
+    	uint32_t len = bufferSize*100;
+    	short int *vals;
 };

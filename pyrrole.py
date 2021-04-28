@@ -8,21 +8,47 @@ CHUNK = 1024
 FORMAT = pyaudio.paInt16
 CHANNELS = 2
 RATE = 44100
+#AMP = 2*127.5
+AMP = 2**12
 
 p = pyaudio.PyAudio()
 stream = p.open(format=FORMAT, channels=CHANNELS, rate=RATE, output=True)
 
 def sineWave(freq, duration):
+    t = np.linspace(0,duration, int(duration*RATE))
+    data = np.sin(2*np.pi*freq*t)*AMP
+    return data.astype(np.int16)
+
+def triWave(freq, duration):
+    t = np.linspace(0, duration, int(duration*RATE))
+    data = 2*AMP / np.pi*np.arcsin(np.sin(2*np.pi*freq*t))
+    return data.astype(np.int16)
+
+def sawWave(freq, duration):
+    t = np.linspace(0, duration, int(duration*RATE))
+    data = -2*AMP / np.pi*np.arctan(1/np.tan(np.pi*freq*(t - np.floor(t))))
+    return data.astype(np.int16)
+
+def squareWave(freq, duration):
+    data = sineWave(freq, duration)
+    for i in range(len(data)):
+        if data[i] < 0:
+            data[i] = -AMP
+        else:
+            data[i] = AMP
+
+    return data
+
+def playWave(freq, duration, func):
     period = 1 / freq
     n = duration / period
     duration = np.floor(n)* period
-    t = np.linspace(0,duration, int(duration*RATE))
-    data = np.sin(2*np.pi*freq*t)*127.5
-    return data.astype(np.int16)
+    return func(freq, duration)
+
 
 def playTone(freq):
     
-    wave = sineWave(freq, 1)
+    wave = playWave(freq, 1, sawWave)
     stream.write(wave)
 
 def main():

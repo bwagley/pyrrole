@@ -13,8 +13,11 @@ p = pyaudio.PyAudio()
 stream = p.open(format=FORMAT, channels=CHANNELS, rate=RATE, output=True)
 
 def sineWave(freq, duration):
-    t = np.linspace(0,duration, duration*RATE)
-    data = np.cos(2*np.pi*freq*t)*127.5
+    period = 1 / freq
+    n = duration / period
+    duration = np.floor(n)* period
+    t = np.linspace(0,duration, int(duration*RATE))
+    data = np.sin(2*np.pi*freq*t)*127.5
     return data.astype(np.int16)
 
 def playTone(freq):
@@ -44,10 +47,8 @@ def main():
                 ##   os.kill(childKey[toPlay], signal.SIGTERM)
                 #    childKey[toPlay] = 0
                 #    continue
-                if childKey[toPlay] == 0:
+                if mlist[i][0][2] != 0:
                     playTone(toPlay)
-                else: 
-                    exit()
         pygame.time.wait(10)
 
 main()

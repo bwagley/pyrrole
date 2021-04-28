@@ -1,1 +1,0 @@
-g++ -g pyrrole.cpp freq_gen.hpp -o pyrrole -lasound

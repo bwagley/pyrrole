@@ -1,0 +1,5 @@
+Pyrrole - A basic audio synthesis tool
+Created for Colorado School of Mines HASS327 (Music Technology) Synthesizer Project
+Requires pyaudio for PCM interface, and pygame for Midi Input.
+Code by Benjamin Wagley
+Hardware Filter Modules by Elijah Mt. Castle

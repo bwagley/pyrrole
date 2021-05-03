@@ -16,7 +16,8 @@ CHUNK = 1024
 FORMAT = pyaudio.paInt16
 CHANNELS = 2
 RATE = 44100
-#AMP = 2*127.5
+
+#Set the amplitude for the output
 AMP = 2**12
 #AMP = 2**16
 
@@ -91,6 +92,7 @@ def main():
     pygame.init()
     pygame.midi.init()
 
+    #Set the midi device used for input
     inp = pygame.midi.Input(3)
 
     midiKey = []
@@ -102,6 +104,7 @@ def main():
     while True:
         if inp.poll():
             mlist = inp.read(1000)
+            #Get every note still in the midi buffer
             for i in range(len(mlist)):
                 #If non-key midi input, change the wave shape
                 if mlist[i][0][0] == 176:

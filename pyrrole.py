@@ -70,6 +70,7 @@ def playTone(freq, shape):
 def main():
     #We have an array of wave shapes so that we can switch through them
     waveShapes = [sineWave, squareWave, triWave, sawWave]
+    waveName = ["Sine", "Square", "Triangle", "Saw"]
     shape = 0
     if argc == 1:
         print("No Wave Shape Given, Setting to Sine Wave")
@@ -105,7 +106,7 @@ def main():
                 #If non-key midi input, change the wave shape
                 if mlist[i][0][0] == 176:
                     shape = (shape + 1) % 4
-                    print(waveShapes[shape])
+                    print("Wave Shape: " + waveName[shape])
                     continue
                 #Otherwise, get the frequenct to play
                 toPlay = midiKey[mlist[i][0][1]]
